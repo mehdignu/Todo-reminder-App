@@ -12,7 +12,7 @@ import RealmSwift
 import ChameleonFramework
 
 class CategoryViewController: SwipeTableViewController {
-
+    
     let realm = try! Realm()
     
     var categories : Results<Category>?
@@ -25,7 +25,7 @@ class CategoryViewController: SwipeTableViewController {
         
         tableView.rowHeight = 80.0
     }
-
+    
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
         var textfield = UITextField()
@@ -59,27 +59,32 @@ class CategoryViewController: SwipeTableViewController {
     //how should we display each cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-      let cell = super.tableView(tableView, cellForRowAt: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         cell.textLabel?.text = categories?[indexPath.row].name ?? "No categories added yet"
-        cell.backgroundColor = UIColor(hexString: categories?[indexPath.row].color ?? "1D9BF6")
+        
+        
+        guard let catColor = UIColor(hexString: categories![indexPath.row].color) else {fatalError()}
+        
+        cell.backgroundColor = catColor
+        cell.textLabel?.textColor = ContrastColorOf(catColor, returnFlat: true)
         return cell
         
-       
+        
     }
     
     //MARK - delete data fro swap
     override func updateModel(at indexPath: IndexPath) {
-                    if let categoryForDel = self.categories?[indexPath.row] {
-                        do {
-                            try self.realm.write {
-                                self.realm.delete(categoryForDel)
-                            }
-                        } catch{
-                            print("error deleting \(error)")
-                        }
-                    }
+        if let categoryForDel = self.categories?[indexPath.row] {
+            do {
+                try self.realm.write {
+                    self.realm.delete(categoryForDel)
+                }
+            } catch{
+                print("error deleting \(error)")
+            }
+        }
     }
-
+    
     //MARK - TableView Delegate Method
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "goToItems", sender: self)
@@ -105,8 +110,8 @@ class CategoryViewController: SwipeTableViewController {
     }
     
     func loadCategories() {
-
-         categories = realm.objects(Category.self)
+        
+        categories = realm.objects(Category.self)
         
         tableView.reloadData()
     }

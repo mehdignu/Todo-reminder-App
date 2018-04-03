@@ -10,12 +10,12 @@ import UIKit
 import SwipeCellKit
 
 class SwipeTableViewController: UITableViewController, SwipeTableViewCellDelegate {
-
+    
     var cell: UITableViewCell?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
     }
     
     //TableView Data Source
@@ -25,7 +25,7 @@ class SwipeTableViewController: UITableViewController, SwipeTableViewCellDelegat
         cell.delegate = self
         
         
-         return cell
+        return cell
     }
     
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
@@ -33,7 +33,7 @@ class SwipeTableViewController: UITableViewController, SwipeTableViewCellDelegat
         
         let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
             
-           self.updateModel(at: indexPath)
+            self.updateModel(at: indexPath)
             
             
         }
@@ -56,5 +56,5 @@ class SwipeTableViewController: UITableViewController, SwipeTableViewCellDelegat
         options.expansionStyle = .destructive
         return options
     }
-
+    
 }
