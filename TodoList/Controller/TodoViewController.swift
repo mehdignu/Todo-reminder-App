@@ -8,8 +8,9 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
-class TodoViewController: UITableViewController {
+class TodoViewController: SwipeTableViewController {
         let realm  = try! Realm()
     var todoItems : Results<Item>?
     var selectedCategory : Category? {
@@ -21,7 +22,8 @@ class TodoViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-
+        tableView.rowHeight = 80.0
+        tableView.separatorStyle = .none
 
     }
 
@@ -34,11 +36,19 @@ class TodoViewController: UITableViewController {
     //how should we display each cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoitemCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         if let item = todoItems?[indexPath.row] {
+            
             cell.textLabel?.text = item.title
+            
+            if let color = UIColor(hexString: selectedCategory!.color)?.darken(byPercentage: CGFloat(indexPath.row) / CGFloat(todoItems!.count)) {
+                 cell.backgroundColor = color
+                 cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
+            }
+            
             cell.accessoryType = item.done ? .checkmark : .none
+            
         } else {
             cell.textLabel?.text = "no Items Added"
         }
@@ -46,6 +56,21 @@ class TodoViewController: UITableViewController {
         
     
         return cell
+    }
+    
+    
+    //MARK - delete data fro swap
+    override func updateModel(at indexPath: IndexPath) {
+        if let item = todoItems?[indexPath.row] {
+            do {
+                try realm.write {
+                    realm.delete(item)
+                    //realm.delete(item)
+                }
+            } catch {
+                print("error saving \(error)")
+            }
+        }
     }
     
     //MARK - TableView Delegate Method
